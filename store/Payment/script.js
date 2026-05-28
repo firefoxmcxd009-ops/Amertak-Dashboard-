@@ -59,7 +59,7 @@ document.querySelector(
 // API URL
 // ===================
 const API =
-"https://YOUR-API.onrender.com";
+"https://amertak-backend.onrender.com";
 
 // ===================
 // Error Payment Popup
