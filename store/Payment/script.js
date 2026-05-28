@@ -1,100 +1,166 @@
 // ==========================
+// API URL
+// ==========================
+const API =
+"https://amertak-backend.onrender.com";
+
+
+
+// ==========================
 // QR Images
 // ==========================
 const qrImages = {
-    vip: "qr/vip.png",
-    mvp: "qr/mvp.png",
-    mvpplus: "qr/mvpplus.png",
-    epic: "qr/epic.png",
-    kingdom: "qr/kingdom.png"
+
+    vip:
+    "/qr/vip.png",
+
+    mvp:
+    "/qr/mvp.png",
+
+    mvpplus:
+    "/qr/mvpplus.png",
+
+    epic:
+    "/qr/epic.png",
+
+    kingdom:
+    "/qr/kingdom.png"
+
 };
+
+
 
 // ==========================
 // Rank Prices
 // ==========================
 const rankPrices = {
+
     vip: "$2",
+
     mvp: "$3.5",
+
     mvpplus: "$5",
+
     epic: "$6.5",
+
     kingdom: "$8"
+
 };
+
+
 
 // ==========================
 // Elements
 // ==========================
-const rankSelect = document.getElementById("rank");
-const qrImg = document.getElementById("qr-img");
-const qrContainer = document.getElementById("qr-container");
-const loader = document.getElementById("loader");
-const rankError = document.getElementById("rankError");
+const rankSelect =
+document.getElementById(
+"rank"
+);
 
-const fileUpload = document.getElementById("fileUpload");
-const filetxt = document.getElementById("filetxt");
+const qrImg =
+document.getElementById(
+"qr-img"
+);
+
+const qrContainer =
+document.getElementById(
+"qr-container"
+);
+
+const loader =
+document.getElementById(
+"loader"
+);
+
+const rankError =
+document.getElementById(
+"rankError"
+);
+
+const fileUpload =
+document.getElementById(
+"fileUpload"
+);
+
+const filetxt =
+document.getElementById(
+"filetxt"
+);
 
 const usernameInput =
-document.getElementById("username");
+document.getElementById(
+"username"
+);
 
 const paymentForm =
-document.getElementById("paymentForm");
+document.getElementById(
+"paymentForm"
+);
 
 const errorBox =
-document.querySelector(".error");
+document.querySelector(
+".error"
+);
 
 const errorTitle =
-document.querySelector(".error-title");
+document.querySelector(
+".error-title"
+);
 
 const progressBorder =
-document.querySelector(".progress-border");
+document.querySelector(
+".progress-border"
+);
 
 const errorInfo =
-document.getElementById("error-info");
+document.getElementById(
+"error-info"
+);
 
 const submitBtn =
 document.querySelector(
 ".button button:last-child"
 );
 
-// ===================
-// API URL
-// ===================
-const API =
-"https://amertak-backend.onrender.com";
 
-// ===================
-// Error Payment Popup
-// ===================
+
+// ==========================
+// Error Messages
+// ==========================
 const errorPay = {
 
     qrcode:
-    "Error generate Khqr!",
+    "Error generate QR code!",
 
     errorConnect:
-    "Error sending order! Check your connection and try again.",
+    "Cannot connect to server!",
 
     username:
-    "Please enter the Minecraft username!",
+    "Please enter Minecraft username!",
 
     invoice:
-    "Please upload the Invoice!",
+    "Please upload invoice image!",
 
     choose:
     "Please select a rank!",
 
-    sucess:
-    "Sucessfuly created KHQR!",
+    success:
+    "QR Code Generated!",
 
     ordered:
-    "Ordered! We're checking your rank order."
+    "Order submitted successfully!"
 
 };
 
-// ===================
-// Error Animation
-// ===================
-function showError(message) {
 
-    // Reset animation
+
+// ==========================
+// Show Error Popup
+// ==========================
+function showError(message){
+
+    if(!errorBox) return;
+
     errorBox.classList.remove(
     "toggleError"
     );
@@ -103,10 +169,8 @@ function showError(message) {
     "toggleProgress"
     );
 
-    // Trigger reflow
     void errorBox.offsetWidth;
 
-    // Start animation
     errorBox.classList.add(
     "toggleError"
     );
@@ -120,29 +184,38 @@ function showError(message) {
 
 }
 
+
+
 // ==========================
-// Remove Animation
+// Remove Popup Animation
 // ==========================
-progressBorder.addEventListener(
+if(progressBorder){
 
-"animationend",
+    progressBorder.addEventListener(
 
-()=>{
+    "animationend",
 
-    errorBox.classList.remove(
-    "toggleError"
-    );
+    ()=>{
 
-    progressBorder.classList.remove(
-    "toggleProgress"
-    );
+        errorBox.classList.remove(
+        "toggleError"
+        );
 
-});
+        progressBorder.classList.remove(
+        "toggleProgress"
+        );
+
+    });
+
+}
+
+
 
 // ==========================
 // Preload QR Images
 // ==========================
 Object.values(qrImages).forEach(
+
 (src)=>{
 
     const img =
@@ -152,43 +225,51 @@ Object.values(qrImages).forEach(
 
 });
 
+
+
 // ==========================
 // File Upload UI
 // ==========================
-fileUpload.addEventListener(
+if(fileUpload){
 
-"change",
+    fileUpload.addEventListener(
 
-function () {
+    "change",
 
-    if (this.files.length > 0) {
+    function(){
 
-        filetxt.textContent =
-        "Uploaded ✓";
+        if(this.files.length > 0){
 
-    }
+            filetxt.textContent =
+            this.files[0].name;
 
-    else {
+        }
 
-        filetxt.textContent =
-        "Upload invoice";
+        else{
 
-    }
+            filetxt.textContent =
+            "Upload invoice";
 
-});
+        }
+
+    });
+
+}
+
+
 
 // ==========================
-// Create QR
+// Generate QR
 // ==========================
-function generateQR() {
+function generateQR(){
 
     const rank =
     rankSelect.value;
 
     // ==========================
-    // Validation
+    // VALIDATION
     // ==========================
-    if (!rank) {
+    if(!rank){
 
         rankError.style.display =
         "block";
@@ -197,20 +278,9 @@ function generateQR() {
         "hidden"
         );
 
-        errorTitle.innerHTML = `
-            <h1 style="
-            color:#da0000;
-            text-shadow:0 0 15px #da0000">
-
-            Error
-
-            </h1>
-        `;
-
-        progressBorder.style.background =
-        "#da0000";
-
-        showError(errorPay.choose);
+        showError(
+        errorPay.choose
+        );
 
         return;
 
@@ -220,13 +290,13 @@ function generateQR() {
     "none";
 
     // ==========================
-    // Show Loader
+    // LOADER
     // ==========================
-    qrContainer.classList.add(
+    loader.classList.remove(
     "hidden"
     );
 
-    loader.classList.remove(
+    qrContainer.classList.add(
     "hidden"
     );
 
@@ -237,9 +307,9 @@ function generateQR() {
     qrImages[rank];
 
     // ==========================
-    // QR Loaded
+    // SUCCESS
     // ==========================
-    tempImg.onload = function () {
+    tempImg.onload = ()=>{
 
         setTimeout(()=>{
 
@@ -254,57 +324,42 @@ function generateQR() {
             "hidden"
             );
 
-            errorTitle.innerHTML = `
-                <h1 style="
-                color:#1f9000;
-                text-shadow:0 0 15px #1f9000">
+            showError(
+            errorPay.success
+            );
 
-                sucessfully
-
-                </h1>
-            `;
-
-            progressBorder.style.background =
-            "#1f9000";
-
-            showError(errorPay.sucess);
-
-        },700);
+        },500);
 
     };
 
     // ==========================
-    // QR Error
+    // ERROR
     // ==========================
-    tempImg.onerror = function () {
+    tempImg.onerror = ()=>{
 
         loader.classList.add(
         "hidden"
         );
 
-        errorTitle.innerHTML = `
-            <h1 style="
-            color:#da0000;
-            text-shadow:0 0 15px #da0000">
+        showError(
+        errorPay.qrcode
+        );
 
-            Error
-
-            </h1>
-        `;
-
-        progressBorder.style.background =
-        "#da0000";
-
-        showError(errorPay.qrcode);
+        console.error(
+        "QR image not found:",
+        tempImg.src
+        );
 
     };
 
 }
 
+
+
 // ==========================
 // SEND ORDER
 // ==========================
-async function sendOrder() {
+async function sendOrder(){
 
     const username =
     usernameInput.value.trim();
@@ -318,22 +373,11 @@ async function sendOrder() {
     // ==========================
     // VALIDATION
     // ==========================
-    if (!username) {
+    if(!username){
 
-        errorTitle.innerHTML = `
-            <h1 style="
-            color:#da0000;
-            text-shadow:0 0 15px #da0000">
-
-            Error
-
-            </h1>
-        `;
-
-        progressBorder.style.background =
-        "#da0000";
-
-        showError(errorPay.username);
+        showError(
+        errorPay.username
+        );
 
         usernameInput.focus();
 
@@ -341,25 +385,11 @@ async function sendOrder() {
 
     }
 
-    if (!rank) {
+    if(!rank){
 
-        rankError.style.display =
-        "block";
-
-        errorTitle.innerHTML = `
-            <h1 style="
-            color:#da0000;
-            text-shadow:0 0 15px #da0000">
-
-            Error
-
-            </h1>
-        `;
-
-        progressBorder.style.background =
-        "#da0000";
-
-        showError(errorPay.choose);
+        showError(
+        errorPay.choose
+        );
 
         rankSelect.focus();
 
@@ -367,29 +397,15 @@ async function sendOrder() {
 
     }
 
-    if (!file) {
+    if(!file){
 
-        errorTitle.innerHTML = `
-            <h1 style="
-            color:#da0000;
-            text-shadow:0 0 15px #da0000">
-
-            Error
-
-            </h1>
-        `;
-
-        progressBorder.style.background =
-        "#da0000";
-
-        showError(errorPay.invoice);
+        showError(
+        errorPay.invoice
+        );
 
         return;
 
     }
-
-    rankError.style.display =
-    "none";
 
     // ==========================
     // FORM DATA
@@ -415,16 +431,17 @@ async function sendOrder() {
     // ==========================
     // BUTTON LOADING
     // ==========================
-    submitBtn.disabled = true;
+    submitBtn.disabled =
+    true;
 
     submitBtn.textContent =
     "Sending...";
 
-    // ==========================
-    // SEND TO BACKEND
-    // ==========================
     try{
 
+        // ==========================
+        // FETCH API
+        // ==========================
         const response =
         await fetch(
 
@@ -440,30 +457,32 @@ async function sendOrder() {
 
         );
 
+        // ==========================
+        // DEBUG
+        // ==========================
+        console.log(
+        "STATUS:",
+        response.status
+        );
+
         const data =
         await response.json();
+
+        console.log(
+        "RESPONSE:",
+        data
+        );
 
         // ==========================
         // SUCCESS
         // ==========================
         if(data.success){
 
-            errorTitle.innerHTML = `
-                <h1 style="
-                color:#1f9000;
-                text-shadow:0 0 15px #1f9000">
+            showError(
+            errorPay.ordered
+            );
 
-                sucessfully
-
-                </h1>
-            `;
-
-            progressBorder.style.background =
-            "#1f9000";
-
-            showError(errorPay.ordered);
-
-            // Reset Form
+            // RESET FORM
             paymentForm.reset();
 
             filetxt.textContent =
@@ -483,21 +502,12 @@ async function sendOrder() {
         // ==========================
         else{
 
-            errorTitle.innerHTML = `
-                <h1 style="
-                color:#da0000;
-                text-shadow:0 0 15px #da0000">
-
-                Error
-
-                </h1>
-            `;
-
-            progressBorder.style.background =
-            "#da0000";
-
             showError(
-            "Failed to send order!"
+
+            data.message ||
+
+            "Failed to submit order!"
+
             );
 
         }
@@ -505,24 +515,11 @@ async function sendOrder() {
     }
 
     // ==========================
-    // SERVER ERROR
+    // ERROR
     // ==========================
     catch(err){
 
         console.error(err);
-
-        errorTitle.innerHTML = `
-            <h1 style="
-            color:#da0000;
-            text-shadow:0 0 15px #da0000">
-
-            Error
-
-            </h1>
-        `;
-
-        progressBorder.style.background =
-        "#da0000";
 
         showError(
         errorPay.errorConnect
@@ -533,9 +530,31 @@ async function sendOrder() {
     // ==========================
     // RESET BUTTON
     // ==========================
-    submitBtn.disabled = false;
+    submitBtn.disabled =
+    false;
 
     submitBtn.textContent =
     "Submit";
+
+}
+
+
+
+// ==========================
+// AUTO FORM SUBMIT
+// ==========================
+if(paymentForm){
+
+    paymentForm.addEventListener(
+
+    "submit",
+
+    (e)=>{
+
+        e.preventDefault();
+
+        sendOrder();
+
+    });
 
 }
