@@ -6,7 +6,6 @@ const API =
 // ====================
 // LOGIN
 // ====================
-
 const loginForm =
 document.getElementById(
 "loginForm"
@@ -15,73 +14,105 @@ document.getElementById(
 if(loginForm){
 
     loginForm.addEventListener(
-    "submit",
 
-    async(e)=>{
+        "submit",
 
-        e.preventDefault();
+        async(e)=>{
 
-        const response =
-        await fetch(
+            e.preventDefault();
 
-            API + "/admin-login",
 
-            {
 
-                method:"POST",
+            const email =
+            document.getElementById(
+            "email"
+            ).value;
 
-                headers:{
 
-                    "Content-Type":
-                    "application/json"
 
-                },
+            const password =
+            document.getElementById(
+            "password"
+            ).value;
 
-                body:JSON.stringify({
 
-                    email:
-                    email.value,
 
-                    password:
-                    password.value
+            try{
 
-                })
+                const response =
+                await fetch(
+
+                    API + "/admin-login",
+
+                    {
+
+                        method:"POST",
+
+                        headers:{
+
+                            "Content-Type":
+                            "application/json"
+
+                        },
+
+                        body:JSON.stringify({
+
+                            email,
+                            password
+
+                        })
+
+                    }
+
+                );
+
+
+
+                const data =
+                await response.json();
+
+
+
+                if(data.success){
+
+                    localStorage.setItem(
+
+                        "token",
+
+                        data.token
+
+                    );
+
+
+
+                    location.href =
+                    "dashboard.html";
+
+                }
+
+                else{
+
+                    alert(
+                    data.message
+                    );
+
+                }
 
             }
 
-        );
+            catch(err){
 
+                console.log(err);
 
+                alert(
+                "Login failed"
+                );
 
-        const data =
-        await response.json();
-
-
-
-        if(data.success){
-
-            localStorage.setItem(
-
-                "token",
-
-                data.token
-
-            );
-
-            location.href =
-            "dashboard.html";
+            }
 
         }
 
-        else{
-
-            alert(
-                data.message
-            );
-
-        }
-
-    });
+    );
 
 }
 
@@ -90,7 +121,6 @@ if(loginForm){
 // ====================
 // DASHBOARD
 // ====================
-
 const ordersContainer =
 document.getElementById(
 "orders"
@@ -98,9 +128,17 @@ document.getElementById(
 
 if(ordersContainer){
 
-    if(!localStorage.getItem(
-        "token"
-    )){
+    const token =
+    localStorage.getItem(
+    "token"
+    );
+
+
+
+    // ====================
+    // CHECK LOGIN
+    // ====================
+    if(!token){
 
         location.href =
         "login.html";
@@ -109,114 +147,187 @@ if(ordersContainer){
 
 
 
+    // ====================
+    // LOAD ORDERS
+    // ====================
     async function loadOrders(){
 
-        const response =
-        await fetch(
-            API + "/orders"
-        );
+        try{
 
-        const orders =
-        await response.json();
+            const response =
+            await fetch(
 
-        ordersContainer.innerHTML =
-        "";
+                API + "/orders",
+
+                {
+
+                    headers:{
+
+                        Authorization:
+                        `Bearer ${token}`
+
+                    }
+
+                }
+
+            );
 
 
 
-        orders.forEach(order=>{
-
-            let statusColor =
-            "#1e293b";
+            const orders =
+            await response.json();
 
 
 
-            if(order.status ===
-            "approved"){
+            // ====================
+            // INVALID TOKEN
+            // ====================
+            if(
 
-                statusColor =
-                "#00ff99";
+            orders.success === false
+
+            ){
+
+                localStorage.removeItem(
+                "token"
+                );
+
+                location.href =
+                "login.html";
+
+                return;
 
             }
 
 
 
-            if(order.status ===
-            "rejected"){
-
-                statusColor =
-                "#ff4d6d";
-
-            }
+            ordersContainer.innerHTML =
+            "";
 
 
 
-            ordersContainer.innerHTML += `
+            orders.forEach(order=>{
 
-            <div class="order-card">
-
-                <img
-                src="${API}/uploads/${order.image}">
-
-                <div class="order-info">
-
-                    <h3>
-                    ${order.username}
-                    </h3>
-
-                    <p>
-                    Rank:
-                    ${order.rank}
-                    </p>
-
-                    <div
-                    class="status"
-
-                    style="background:${statusColor}">
-
-                    ${order.status}
-
-                    </div>
+                let statusColor =
+                "#1e293b";
 
 
 
-                    <div class="actions">
+                if(
+                order.status ===
+                "approved"
+                ){
 
-                        <button
-                        class="approve"
+                    statusColor =
+                    "#00ff99";
 
-                        onclick="updateStatus(
-                        '${order._id}',
-                        'approved'
-                        )">
-
-                        Approve
-
-                        </button>
+                }
 
 
 
-                        <button
-                        class="reject"
+                if(
+                order.status ===
+                "rejected"
+                ){
 
-                        onclick="updateStatus(
-                        '${order._id}',
-                        'rejected'
-                        )">
+                    statusColor =
+                    "#ff4d6d";
 
-                        Reject
+                }
 
-                        </button>
+
+
+                ordersContainer.innerHTML += `
+
+                <div class="order-card">
+
+                    <img
+                    src="${API}/uploads/${order.image}">
+
+                    <div class="order-info">
+
+                        <h3>
+                        ${order.username}
+                        </h3>
+
+                        <p>
+                        Rank:
+                        ${order.rank}
+                        </p>
+
+                        <div
+                        class="status"
+
+                        style="background:${statusColor}">
+
+                        ${order.status}
+
+                        </div>
+
+
+
+                        <div class="actions">
+
+                            <button
+                            class="approve"
+
+                            onclick="updateStatus(
+                            '${order._id}',
+                            'approved'
+                            )">
+
+                            Approve
+
+                            </button>
+
+
+
+                            <button
+                            class="reject"
+
+                            onclick="updateStatus(
+                            '${order._id}',
+                            'rejected'
+                            )">
+
+                            Reject
+
+                            </button>
+
+
+
+                            <button
+                            class="delete"
+
+                            onclick="deleteOrder(
+                            '${order._id}'
+                            )">
+
+                            Delete
+
+                            </button>
+
+                        </div>
 
                     </div>
 
                 </div>
 
-            </div>
+                `;
 
-            `;
+            });
 
-        });
+        }
+
+        catch(err){
+
+            console.log(err);
+
+            alert(
+            "Failed to load orders"
+            );
+
+        }
 
     }
 
@@ -231,43 +342,149 @@ if(ordersContainer){
 // ====================
 // UPDATE STATUS
 // ====================
-
 async function updateStatus(
     id,
     status
 ){
 
-    await fetch(
-
-        API + "/update-status",
-
-        {
-
-            method:"POST",
-
-            headers:{
-
-                "Content-Type":
-                "application/json"
-
-            },
-
-            body:JSON.stringify({
-
-                id,
-                status
-
-            })
-
-        }
-
+    const token =
+    localStorage.getItem(
+    "token"
     );
 
-    location.reload();
+
+
+    try{
+
+        await fetch(
+
+            API + "/update-status",
+
+            {
+
+                method:"POST",
+
+                headers:{
+
+                    "Content-Type":
+                    "application/json",
+
+                    Authorization:
+                    `Bearer ${token}`
+
+                },
+
+                body:JSON.stringify({
+
+                    id,
+                    status
+
+                })
+
+            }
+
+        );
+
+
+
+        location.reload();
+
+    }
+
+    catch(err){
+
+        console.log(err);
+
+        alert(
+        "Update failed"
+        );
+
+    }
 
 }
 
 
 
 // ====================
-//
+// DELETE ORDER
+// ====================
+async function deleteOrder(id){
+
+    const token =
+    localStorage.getItem(
+    "token"
+    );
+
+
+
+    const confirmDelete =
+    confirm(
+    "Delete this order?"
+    );
+
+
+
+    if(!confirmDelete){
+
+        return;
+
+    }
+
+
+
+    try{
+
+        await fetch(
+
+            API +
+            "/delete-order/" +
+            id,
+
+            {
+
+                method:"DELETE",
+
+                headers:{
+
+                    Authorization:
+                    `Bearer ${token}`
+
+                }
+
+            }
+
+        );
+
+
+
+        location.reload();
+
+    }
+
+    catch(err){
+
+        console.log(err);
+
+        alert(
+        "Delete failed"
+        );
+
+    }
+
+}
+
+
+
+// ====================
+// LOGOUT
+// ====================
+function logout(){
+
+    localStorage.removeItem(
+    "token"
+    );
+
+    location.href =
+    "login.html";
+
+}
