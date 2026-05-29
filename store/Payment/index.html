@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
+/>
+
+<title>Amertak Store</title>
+
+<link
+href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap"
+rel="stylesheet"
+/>
+
+<style>
+
+/* =========================
+RESET
+========================= */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+body{
+    font-family:'Kantumruy Pro',sans-serif;
+    background:#050505;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+    overflow-x:hidden;
+    color:white;
+}
+
+/* =========================
+BACKGROUND
+========================= */
+body::before,
+body::after{
+    content:"";
+    position:fixed;
+    width:350px;
+    height:350px;
+    border-radius:50%;
+    filter:blur(120px);
+    z-index:-1;
+}
+
+body::before{
+    background:#ff0037;
+    top:-120px;
+    left:-120px;
+    opacity:.25;
+}
+
+body::after{
+    background:#ff0055;
+    bottom:-120px;
+    right:-120px;
+    opacity:.2;
+}
+
+/* =========================
+CONTAINER
+========================= */
+.store-container{
+    width:100%;
+    max-width:420px;
+}
+
+/* =========================
+CARD
+========================= */
+.store-card{
+    background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:28px;
+    padding:28px;
+    backdrop-filter:blur(18px);
+    box-shadow:
+    0 10px 40px rgba(0,0,0,.5),
+    inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+/* =========================
+HEADER
+========================= */
+.store-header{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.store-header h1{
+    font-size:32px;
+    font-weight:700;
+    margin-bottom:8px;
+    background:linear-gradient(
+    90deg,
+    #ffffff,
+    #ff2f67
+    );
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.store-header p{
+    color:#b9b9b9;
+    font-size:14px;
+}
+
+/* =========================
+FORM
+========================= */
+.form-group{
+    margin-bottom:18px;
+}
+
+label{
+    display:block;
+    margin-bottom:10px;
+    font-size:14px;
+    color:#e8e8e8;
+    font-weight:600;
+}
+
+input,
+select{
+    width:100%;
+    border:none;
+    outline:none;
+    border-radius:16px;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+    color:white;
+    padding:16px;
+    font-size:15px;
+    transition:.25s;
+}
+
+input::placeholder{
+    color:#9f9f9f;
+}
+
+input:focus,
+select:focus{
+    border-color:#ff2b63;
+    box-shadow:0 0 0 4px rgba(255,0,85,.12);
+}
+
+/* =========================
+UPLOAD BUTTON
+========================= */
+.upload-btn{
+    width:100%;
+    padding:16px;
+    border-radius:16px;
+    cursor:pointer;
+    background:rgba(255,255,255,.05);
+    border:1px dashed rgba(255,255,255,.18);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+    transition:.25s;
+}
+
+.upload-btn:hover{
+    border-color:#ff2b63;
+    background:rgba(255,255,255,.08);
+}
+
+.upload-left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.upload-icon{
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    background:rgba(255,0,85,.15);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+}
+
+.upload-text{
+    display:flex;
+    flex-direction:column;
+}
+
+.upload-title{
+    font-size:14px;
+    font-weight:600;
+}
+
+.upload-sub{
+    font-size:12px;
+    color:#9d9d9d;
+}
+
+/* =========================
+QR SECTION
+========================= */
+.qr-box{
+    margin-top:22px;
+    display:flex;
+    justify-content:center;
+}
+
+#qr-container{
+    width:100%;
+    padding:20px;
+    border-radius:20px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.08);
+    text-align:center;
+}
+
+#qr-img{
+    width:100%;
+    max-width:250px;
+    border-radius:18px;
+    display:block;
+    margin:auto;
+}
+
+/* =========================
+LOADER
+========================= */
+#loader{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+    padding:20px;
+}
+
+.spinner{
+    width:50px;
+    height:50px;
+    border-radius:50%;
+    border:4px solid rgba(255,255,255,.1);
+    border-top-color:#ff2b63;
+    animation:spin .7s linear infinite;
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+/* =========================
+BUTTONS
+========================= */
+.button-group{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-top:25px;
+}
+
+button{
+    border:none;
+    outline:none;
+    padding:16px;
+    border-radius:16px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:700;
+    transition:.25s;
+}
+
+.generate-btn{
+    background:rgba(255,255,255,.08);
+    color:white;
+}
+
+.generate-btn:hover{
+    background:rgba(255,255,255,.12);
+}
+
+.submit-btn{
+    background:linear-gradient(
+    135deg,
+    #ff0055,
+    #ff2347
+    );
+    color:white;
+    box-shadow:
+    0 10px 25px rgba(255,0,85,.35);
+}
+
+.submit-btn:hover{
+    transform:translateY(-2px);
+}
+
+button:disabled{
+    opacity:.7;
+    cursor:not-allowed;
+}
+
+/* =========================
+ERROR
+========================= */
+.error{
+    position:fixed;
+    top:25px;
+    right:25px;
+    width:320px;
+    background:#111;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:18px;
+    padding:18px;
+    transform:translateX(420px);
+    transition:.35s;
+    overflow:hidden;
+    z-index:999;
+}
+
+.error.toggleError{
+    transform:translateX(0);
+}
+
+.error-title{
+    font-size:16px;
+    margin-bottom:8px;
+    color:#ff3864;
+    text-transform:uppercase;
+}
+
+#error-info{
+    font-size:14px;
+    color:#ddd;
+}
+
+.progress-border{
+    position:absolute;
+    left:0;
+    bottom:0;
+    width:100%;
+    height:3px;
+    background:#ff0055;
+    transform-origin:left;
+    transform:scaleX(0);
+}
+
+.toggleProgress{
+    animation:progressAnim 3s linear;
+}
+
+@keyframes progressAnim{
+    from{
+        transform:scaleX(1);
+    }
+    to{
+        transform:scaleX(0);
+    }
+}
+
+/* =========================
+UTILS
+========================= */
+.hidden{
+    display:none !important;
+}
+
+#rankError{
+    display:none;
+    margin-top:10px;
+    color:#ff5379;
+    font-size:13px;
+}
+
+.price-box{
+    margin-top:12px;
+    padding:14px;
+    border-radius:14px;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.07);
+    color:#ff5f86;
+    font-weight:700;
+    text-align:center;
+}
+#successBox{
+    background:rgba(0,255,120,.08);
+}
+
+/* =========================
+MOBILE
+========================= */
+@media(max-width:480px){
+
+    .store-card{
+        padding:22px;
+        border-radius:24px;
+    }
+
+    .button-group{
+        grid-template-columns:1fr;
+    }
+
+    .error{
+        width:calc(100% - 30px);
+        right:15px;
+    }
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="store-container">
+
+    <div class="store-card">
+
+        <!-- HEADER -->
+        <div class="store-header">
+            <h1>Amertak Store</h1>
+            <p>Buy Minecraft Rank & Upload Payment Invoice</p>
+        </div>
+
+        <!-- FORM -->
+        <form
+        id="paymentForm"
+        onsubmit="return false;"
+        >
+
+            <!-- USERNAME -->
+            <div class="form-group">
+                <label>Minecraft Username</label>
+
+                <input
+                type="text"
+                id="username"
+                placeholder="Enter username..."
+                required
+                />
+            </div>
+
+            <!-- RANK -->
+            <div class="form-group">
+
+                <label>Select Rank</label>
+
+                <select id="rank" required>
+
+                    <option value="">
+                    Choose Rank
+                    </option>
+
+                    <option value="vip">
+                    VIP - $2
+                    </option>
+
+                    <option value="mvp">
+                    MVP - $3.5
+                    </option>
+
+                    <option value="mvpplus">
+                    MVP+ - $5
+                    </option>
+
+                    <option value="epic">
+                    EPIC - $6.5
+                    </option>
+
+                    <option value="kingdom">
+                    KINGDOM - $8
+                    </option>
+
+                </select>
+
+                <p id="rankError">
+                Please select a rank!
+                </p>
+
+                <div
+                class="price-box hidden"
+                id="priceBox"
+                ></div>
+
+            </div>
+
+            <!-- FILE -->
+            <div class="form-group">
+
+                <label>Upload Invoice</label>
+
+                <label
+                for="fileUpload"
+                class="upload-btn"
+                >
+
+                    <div class="upload-left">
+
+                        <div class="upload-icon">
+                        📤
+                        </div>
+
+                        <div class="upload-text">
+                            <span class="upload-title">
+                            Upload Invoice
+                            </span>
+
+                            <span
+                            class="upload-sub"
+                            id="filetxt"
+                            >
+                            No file selected
+                            </span>
+                        </div>
+
+                    </div>
+
+                </label>
+
+                <input
+                type="file"
+                id="fileUpload"
+                accept="image/*"
+                hidden
+                required
+                />
+
+            </div>
+
+            <!-- LOADER -->
+            <div
+            id="loader"
+            class="hidden"
+            >
+                <div class="spinner"></div>
+                <p>Loading QR...</p>
+            </div>
+
+            <!-- QR -->
+            <div class="qr-box">
+
+                <div
+                id="qr-container"
+                class="hidden"
+                >
+                    <img
+                    id="qr-img"
+                    src=""
+                    alt="QR Code"
+                    />
+                </div>
+
+            </div>
+
+            <!-- BUTTONS -->
+            <div class="button-group">
+
+                <button
+                type="button"
+                class="generate-btn"
+                onclick="generateQR()"
+                >
+                Generate QR
+                </button>
+
+                <button
+                type="button"
+                class="submit-btn"
+                onclick="sendOrder()"
+                >
+                Submit Order
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- ERROR -->
+<div class="error">
+
+    <h1 class="error-title">
+    Notification
+    </h1>
+
+    <div id="error-info"></div>
+
+    <div class="progress-border"></div>
+
+</div>
+
+<!-- SUCCESS BOX -->
+<div id="successBox" class="error hidden" style="border:1px solid rgba(0,255,120,.25);">
+    <h1 class="error-title" style="color:#00ff9d;">Order Success</h1>
+    <div id="success-info"></div>
+</div>
+
+
+<script>
+
+// ==========================
+// API URL
+// ==========================
+const API = "https://amertak-backend.onrender.com";
+
+
+// ==========================
+// QR Images
+// ==========================
+const qrImages = {
+
+    vip: "/store/Payment/qr/vip.png",
+    mvp: "/store/Payment/qr/mvp.png",
+    mvpplus: "/store/Payment/qr/mvpplus.png",
+    epic: "/store/Payment/qr/epic.png",
+    kingdom: "/store/Payment/qr/kingdom.png"
+
+};
+
+
+// ==========================
+// Rank Prices
+// ==========================
+const rankPrices = {
+
+    vip: "$2",
+    mvp: "$3.5",
+    mvpplus: "$5",
+    epic: "$6.5",
+    kingdom: "$8"
+
+};
+
+
+// ==========================
+// ELEMENTS
+// ==========================
+const rankSelect = document.getElementById("rank");
+const qrImg = document.getElementById("qr-img");
+const qrContainer = document.getElementById("qr-container");
+const loader = document.getElementById("loader");
+const rankError = document.getElementById("rankError");
+const fileUpload = document.getElementById("fileUpload");
+const filetxt = document.getElementById("filetxt");
+const usernameInput = document.getElementById("username");
+const paymentForm = document.getElementById("paymentForm");
+
+const errorBox = document.querySelector(".error");
+const progressBorder = document.querySelector(".progress-border");
+const errorInfo = document.getElementById("error-info");
+
+const submitBtn = document.querySelector(".submit-btn");
+const priceBox = document.getElementById("priceBox");
+
+const successBox = document.getElementById("successBox");
+const successInfo = document.getElementById("success-info");
+
+
+// ==========================
+// ERROR POPUP (KEEP ANIMATION)
+// ==========================
+function showError(message){
+
+    errorBox.classList.remove("toggleError");
+    progressBorder.classList.remove("toggleProgress");
+
+    void errorBox.offsetWidth;
+
+    errorBox.classList.add("toggleError");
+    progressBorder.classList.add("toggleProgress");
+
+    errorInfo.innerHTML = `<span>${message}</span>`;
+}
+
+
+// ==========================
+// AUTO CLOSE ERROR
+// ==========================
+progressBorder.addEventListener("animationend", ()=>{
+
+    errorBox.classList.remove("toggleError");
+    progressBorder.classList.remove("toggleProgress");
+
+});
+
+
+// ==========================
+// FILE UI
+// ==========================
+fileUpload.addEventListener("change", function(){
+
+    if(this.files.length > 0){
+        filetxt.textContent = this.files[0].name;
+    }else{
+        filetxt.textContent = "No file selected";
+    }
+
+});
+
+
+// ==========================
+// PRICE SHOW
+// ==========================
+rankSelect.addEventListener("change", ()=>{
+
+    const rank = rankSelect.value;
+
+    if(rank){
+        priceBox.classList.remove("hidden");
+        priceBox.innerHTML = `Price: ${rankPrices[rank]}`;
+    }else{
+        priceBox.classList.add("hidden");
+    }
+
+});
+
+
+// ==========================
+// GENERATE QR (KEEP ANIMATION)
+// ==========================
+function generateQR(){
+
+    const rank = rankSelect.value;
+
+    if(!rank){
+        showError("Please select a rank!");
+        return;
+    }
+
+    loader.classList.remove("hidden");
+    qrContainer.classList.add("hidden");
+
+    const img = new Image();
+    img.src = qrImages[rank];
+
+    img.onload = ()=>{
+
+        setTimeout(()=>{
+
+            qrImg.src = img.src;
+
+            loader.classList.add("hidden");
+            qrContainer.classList.remove("hidden");
+
+            showError("QR Generated!");
+
+        }, 500);
+
+    };
+
+    img.onerror = ()=>{
+
+        loader.classList.add("hidden");
+        showError("QR load failed!");
+
+    };
+}
+
+
+// ==========================
+// FETCH WITH TIMEOUT (FIX FOR "CANNOT CONNECT")
+// ==========================
+function fetchWithTimeout(url, options, timeout = 15000){
+
+    return new Promise((resolve, reject)=>{
+
+        const controller = new AbortController();
+        const timer = setTimeout(()=>controller.abort(), timeout);
+
+        fetch(url, {
+            ...options,
+            signal: controller.signal
+        })
+        .then(res=>{
+            clearTimeout(timer);
+            resolve(res);
+        })
+        .catch(err=>{
+            clearTimeout(timer);
+            reject(err);
+        });
+
+    });
+
+}
+
+
+// ==========================
+// SEND ORDER (FIXED STABLE VERSION)
+// ==========================
+async function sendOrder(){
+
+    const username = usernameInput.value.trim();
+    const rank = rankSelect.value;
+    const file = fileUpload.files[0];
+
+    // VALIDATION
+    if(!username){
+        showError("Please enter Minecraft username!");
+        return;
+    }
+
+    if(!rank){
+        showError("Please select a rank!");
+        return;
+    }
+
+    if(!file){
+        showError("Please upload invoice image!");
+        return;
+    }
+
+    successBox.classList.add("hidden");
+
+    const formData = new FormData();
+    formData.append("username", username);
+    formData.append("rank", rank);
+
+    // 🔥 IMPORTANT FIX (UPLOAD FAILED FIX)
+    formData.append("file", file);
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sending...";
+
+    loader.classList.remove("hidden");
+
+    try{
+
+        const response = await fetchWithTimeout(
+            API + "/submit-order",
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+        let data;
+
+        try {
+            data = await response.json();
+        } catch {
+            throw new Error("Invalid server response");
+        }
+
+        loader.classList.add("hidden");
+
+        if(!response.ok){
+            throw new Error(data.message || "Server error");
+        }
+
+        if(data.success){
+
+            successBox.classList.remove("hidden");
+
+            successInfo.innerHTML = `
+                <p>Username: <b>${username}</b></p>
+                <p>Rank: <b>${rank}</b></p>
+                <p>Status: <b>Pending Review</b></p>
+                <p style="margin-top:10px;color:#7CFFB2;">Order Success ✅</p>
+            `;
+
+            showError("Order submitted successfully!");
+
+            paymentForm.reset();
+            qrContainer.classList.add("hidden");
+            filetxt.textContent = "No file selected";
+            priceBox.classList.add("hidden");
+
+        }else{
+            showError(data.message || "Upload failed");
+        }
+
+    }catch(err){
+
+        console.log("ERROR:", err);
+
+        // 🔥 CLEAN MESSAGE FOR USER
+        if(err.name === "AbortError"){
+            showError("Server timeout. Try again.");
+        }else{
+            showError("Cannot connect to server!");
+        }
+
+    }
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit Order";
+}
+
+
+// ==========================
+// FORM SUBMIT FIX
+// ==========================
+paymentForm.addEventListener("submit", (e)=>{
+    e.preventDefault();
+    sendOrder();
+});
+
+</script>
+
+</body>
+</html>
